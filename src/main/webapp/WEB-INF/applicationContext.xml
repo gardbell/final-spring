@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- dbConfig -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"></property>
+		<property name="url" value="jdbc:oracle:thin:@ezen-javayong.iptime.org:9000:orcl"></property>
+		<property name="username" value="ezen_project"></property>
+		<property name="password" value="ezen1234"></property>
+	</bean>
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	<bean id="sqlSessionFactoryBean" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		<property name="configLocation" value="classpath:/mybatis-config.xml"></property>
+	</bean>
+	<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg name="sqlSessionFactory" ref="sqlSessionFactoryBean"></constructor-arg>
+	</bean>
+	
+	<!-- daos -->
+	<bean id="scheduleDao" class="com.ace.schedule.model.ScheduleDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"/>
+	</bean>
+	<bean id="memberDao" class="com.ace.member.model.MemberDAOImple">
+		<constructor-arg>
+			<ref bean="sqlSessionTemplate"/>
+		</constructor-arg>
+	</bean>
+	<bean id="companyDao" class="com.ace.company.model.CompanyDAOImple">
+		<constructor-arg>
+			<ref bean="sqlSessionTemplate"/>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="client_telDao" class="com.ace.client_tel.model.Client_TelDAOImple">
+		<constructor-arg>
+			<ref bean="sqlSessionTemplate"/>
+		</constructor-arg>
+	</bean>
+	<bean id="salesDao" class="com.ace.sales_item.model.SalesDAOImple">
+		<constructor-arg>
+			<ref bean="sqlSessionTemplate"/>
+		</constructor-arg>
+	</bean>
+	
+	
+	<bean id="company_newsDao" class="com.ace.company_news.model.Company_newsDAOImple">
+		<constructor-arg>
+			<ref bean="sqlSessionTemplate"/>
+		</constructor-arg>
+	</bean>
+	<bean id="company_eventDao" class="com.ace.company_event.model.Company_eventDAOImple">
+		<constructor-arg>
+			<ref bean="sqlSessionTemplate"/>
+		</constructor-arg>
+	</bean>
+	
+	
+	
+	<bean id="benefitDao" class="com.ace.benefit.model.BenefitDAOImple">
+		<constructor-arg>
+			<ref bean="sqlSessionTemplate"/>
+		</constructor-arg>
+	</bean>
+	<bean id="workDao" class="com.ace.work.model.WorkDAOImple">
+		<constructor-arg>
+			<ref bean="sqlSessionTemplate"/>
+		</constructor-arg>
+	</bean>
+	
+	
+   <bean id="payDao" class="com.ace.pay.model.PayDAOImple">
+      <constructor-arg ref="sqlSessionTemplate"/>
+   </bean>
+   <bean id="licenseDao" class="com.ace.license.model.LicenseDAOImple">
+      <constructor-arg ref="sqlSessionTemplate"/>
+   </bean>
+   
+   
+   <bean id="price_listDao"
+		class="com.ace.price_list.model.Price_ListDAOImple">
+		<constructor-arg>
+			<ref bean="sqlSessionTemplate"></ref>
+		</constructor-arg>
+	</bean>
+	<bean id="policyDao" class="com.ace.policy.model.PolicyDAOImple">
+		<constructor-arg>
+			<ref bean="sqlSessionTemplate"></ref>
+		</constructor-arg>
+	</bean>
+	<bean id="qnaDao" class="com.ace.qna.model.QnaDAOImple">
+		<constructor-arg>
+			<ref bean="sqlSessionTemplate"></ref>
+		</constructor-arg>
+	</bean>	
+	<bean id="site_logDao"
+		class="com.ace.site_log.model.Site_LogDAOImple">
+		<constructor-arg>
+			<ref bean="sqlSessionTemplate" />
+		</constructor-arg>
+	</bean>
+	
+	
+	<bean id="approvalDao" class="com.ace.approval.model.ApprovalDAOImple">
+      <constructor-arg ref="sqlSessionTemplate"/>
+   </bean>
+   <bean id="approval_fileDao" class="com.ace.approval_file.model.Approval_fileDAOImple">
+      <constructor-arg ref="sqlSessionTemplate"/>
+   </bean>
+   
+</beans>

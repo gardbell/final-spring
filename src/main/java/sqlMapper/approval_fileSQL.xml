@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ace.approval_file">
+	<insert id="addFile" parameterType="com.ace.approval_file.model.Approval_fileDTO">
+		insert into
+		approval_file
+		values(
+			#{com_idx},
+			#{ref},
+			#{filename}
+		)
+	</insert>
+	<select id="approval_File" parameterType="java.util.Map"
+		resultType="com.ace.approval_file.model.Approval_fileDTO">
+		select * from approval_file where ref=#{ref} and com_idx=#{com_idx}
+	</select>
+	<delete id="delFile" parameterType="java.util.Map">
+		delete 
+		from approval_file
+		where com_idx=#{com_idx} 
+		<if test="check==1">
+			and filename=#{filename}
+		</if>
+		<if test="check==2">
+			and ref=#{ref}
+		</if>
+	</delete>
+</mapper>

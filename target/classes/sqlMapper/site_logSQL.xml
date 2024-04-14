@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ace.site_log">
+	<select id="selectCompanyNews_Log" resultType="Integer">
+		select log_count
+		from site_log
+		where log_name='회사소식'
+	</select>
+	<select id="selectCompanyEvent_Log" resultType="Integer">
+		select log_count
+		from site_log
+		where log_name='경조사'
+	</select>
+	<select id="selectDocument_Log" resultType="Integer">
+		select log_count
+		from site_log
+		where log_name='결재문서'
+	</select>
+	<select id="selectSchedule_Log" resultType="Integer">
+		select log_count
+		from site_log
+		where log_name='스케줄'
+	</select>
+	<select id="selectHR_Log" resultType="Integer">
+		select log_count
+		from site_log
+		where log_name='인사관리'
+	</select>
+	<select id="selectMail_Log" resultType="Integer">
+		select log_count
+		from site_log
+		where log_name='메일'
+	</select>
+	<select id="selectManage_Log" resultType="Integer">
+		select log_count
+		from site_log
+		where log_name='기업관리'
+	</select>
+	
+	<update id="updateCompanyNews_Log">
+		UPDATE site_log
+		SET log_count = log_count + 1
+		WHERE log_name = '회사소식'
+	</update>
+	<update id="updateCompanyEvent_Log">
+		UPDATE site_log
+		SET log_count = log_count + 1
+		WHERE log_name = '경조사'
+	</update>
+	<update id="updateDocument_Log">
+		UPDATE site_log
+		SET log_count = log_count + 1
+		WHERE log_name = '결재문서'
+	</update>
+	<update id="updateSchedule_Log">
+		UPDATE site_log
+		SET log_count = log_count + 1
+		WHERE log_name = '스케줄'
+	</update>
+	<update id="updateHR_Log">
+		UPDATE site_log
+		SET log_count = log_count + 1
+		WHERE log_name = '인사관리'
+	</update>
+	<update id="updateMail_Log">
+		UPDATE site_log
+		SET log_count = log_count + 1
+		WHERE log_name = '메일'
+	</update>
+	<update id="updateManage_Log">
+		UPDATE site_log
+		SET log_count = log_count + 1
+		WHERE log_name = '기업관리'
+	</update>
+</mapper>

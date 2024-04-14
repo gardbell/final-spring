@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ace.benefit">
+	<insert id="benefitWrite">
+		insert into benefit
+		values(benefit_bidx.nextval,#{idx},#{sort},sysdate,to_date(#{bdate}),0,#{bnote})
+	</insert>
+	<select id="benefitList" parameterType="Integer" resultType="com.ace.benefit.model.BenefitDTO">
+		select
+			*
+		from
+			benefit
+		where
+		    idx=#{idx} 
+	</select>
+	<update id="benefitPromotion" parameterType="Integer">
+		update benefit set
+			status=1
+		where idx=#{idx}
+	</update>
+</mapper>

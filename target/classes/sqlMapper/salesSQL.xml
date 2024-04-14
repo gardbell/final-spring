@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ace.member">
+	<select id="salesFind" 
+		parameterType="Integer" 
+		resultType="com.ace.sales_item.model.SalesDTO">
+		SELECT sales.*, sales_item.item_name
+		FROM sales
+		JOIN sales_item ON sales.item_idx = sales_item.item_idx
+		WHERE sales.com_idx = #{com_idx} order by writedate desc
+	</select>
+	
+	<insert id="salesWrite"
+		parameterType="com.ace.sales_item.model.SalesDTO">
+		insert into sales
+		values(
+			#{com_idx},
+			#{writedate},
+			#{sales},
+			#{item_idx})
+	</insert>
+	
+	<select id="itemFind" parameterType="Integer" resultType="com.ace.sales_item.model.Sales_itemDTO">
+		select * from sales_item where com_idx=#{com_idx}
+	</select>
+	
+	<insert id="salesNewWrite" parameterType="com.ace.sales_item.model.Sales_itemDTO">
+		insert into sales_item values(
+			item_idx.nextval,
+			#{com_idx},
+			#{item_name},
+			#{item_price},
+			#{item_cost}
+		)
+	</insert>
+	<delete id="delSale" parameterType="Map">
+		delete from sales 
+			where writedate=#{writedate} and com_idx=#{com_idx}
+	</delete>
+</mapper>

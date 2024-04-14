@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ace.client_tel">
+	<insert id="insertTel" parameterType="com.ace.client_tel.model.Client_TelDTO">
+		insert into client_tel
+			values(
+				client_tel_idx.nextval,
+				#{com_idx},
+				#{com_name},
+				#{ceo},
+				#{tel}
+			)
+	</insert>
+	<select id="telList" parameterType="java.util.Map" resultType="com.ace.client_tel.model.Client_TelDTO">
+select * from
+(select rownum as rnum,a.*from
+(select * from client_tel where com_idx=#{com_idx} order by client_tel_idx desc)a)b 
+where rnum <![CDATA[>=]]>#{start} and rnum<![CDATA[<=]]>#{end}
+</select>
+	<select id="rewriteTel" parameterType="Integer" resultType="com.ace.client_tel.model.Client_TelDTO">
+		select * from client_tel where client_tel_idx=#{client_tel_idx}
+	</select>
+	<update id="rewriteTelOk">
+		update client_tel 
+			set com_name=#{com_name}, ceo=#{ceo}, tel=#{tel}
+		where client_tel_idx=#{client_tel_idx}
+	</update>
+	
+	<select id="telTotalCnt" parameterType="Integer" resultType="Integer">
+		select count(*) from client_tel where com_idx=#{com_idx}
+	</select>
+	<delete id="delTel" parameterType="Integer">
+		delete from client_tel where client_tel_idx=#{client_tel_idx}
+	</delete>
+</mapper>

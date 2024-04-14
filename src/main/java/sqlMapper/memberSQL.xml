@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ace.member">
+	<insert id="memberInsert" parameterType="com.ace.member.model.MemberDTO">
+		insert into 
+			member 
+		values(idx_idx.nextval,
+			#{com_idx}, 
+			#{name},
+			#{id}, 
+			#{pwd}, 
+			#{email}, 
+			#{addr}, 
+			#{tel},
+			#{hum_num},
+			#{dept},
+			0,
+			0,
+			sysdate)
+	</insert>
+	<select id="memberLogin" resultType="String">
+		select pwd from member where id=#{id}
+	</select>
+	<select id="getUserInfo" resultType="com.ace.member.model.MemberDTO">
+		select 
+			* 
+		from
+			member
+		where id=#{id} 
+	</select>
+	<select id="idCheck" parameterType="String" resultType="String">
+		select id from member where id=#{id}
+	</select>
+	<select id="idFind" parameterType="Map" resultType="String">
+		select id from member where name=#{name} and email=#{email}
+	</select>
+	<select id="pwdFind" parameterType="Map" resultType="String">
+		select pwd from member where id=#{id} and tel=#{tel} and name=#{name} and email=#{email}
+	</select>
+	<select id="memberList" parameterType="Integer" resultType="com.ace.member.model.MemberDTO">
+		select * from member where com_idx=#{com_idx}
+	</select>
+	<update id="update" parameterType="com.ace.member.model.MemberDTO">
+		update member set 
+			name=#{name},
+			email=#{email},
+			addr=#{addr},
+			tel=#{tel},
+			dept=#{dept},
+			sal=#{sal},
+			rank_num=#{rank_num}
+		where id=#{id}
+	</update>
+	<update id="memberPromotion" parameterType="Integer">
+		update member set
+			rank_num=3
+		where idx=#{idx}
+	</update>
+	<select id="memberNot" parameterType="Map" resultType="com.ace.member.model.MemberDTO">
+		select * from member where com_idx=#{com_idx} and rank_num=#{rank_num}
+	</select>
+	
+	<select id="memberMailList" parameterType="Integer" resultType="com.ace.member.model.MemberDTO">
+	select * from
+	(select rownum as rnum,a.*from
+	(select * from member where com_idx=#{com_idx} order by hiredate asc)a)b 
+	where rnum <![CDATA[>=]]>#{start} and rnum<![CDATA[<=]]>#{end}
+	</select>
+	
+	<select id="memberMailListTotalCnt" parameterType="Integer" resultType="Integer">
+	select count(*) from member where com_idx=#{com_idx}
+	</select>
+	
+	<select id="memberMailListSearch" parameterType="java.util.Map" resultType="com.ace.member.model.MemberDTO">
+	select * from
+	(select rownum as rnum,a.*from
+	(select * from member where com_idx=#{com_idx} and name like '%' || #{memberKeyword} || '%' order by hiredate asc)a)b 
+	where rnum <![CDATA[>=]]>#{start} and rnum<![CDATA[<=]]>#{end}
+	</select>
+	
+	<select id="memberMailListSearchTotalCnt" parameterType="java.util.Map" resultType="Integer">
+	select count(*) from member where com_idx=#{com_idx} and name like '%' || #{memberKeyword} || '%'
+	</select>
+	
+	
+	<delete id="delete" parameterType="Map">
+		delete
+		from member
+		where pwd=#{pwd}
+		and id=#{id}
+	</delete>
+	<select id="memworkList" parameterType="Integer" resultType="com.ace.member.model.MemberDTO">
+   		select m.*, w.work,w.work_day,w.work_date,w.note,w.status
+    	from member m
+    	join work w on m.idx = w.idx
+   		where com_idx = #{com_idx}	 
+	</select>
+	<select id="memBenefitList" parameterType="Integer" resultType="com.ace.member.model.MemberDTO">
+		select m.*,b.bidx,b.sort,b.bdate,b.bnote,b.status
+		from member m
+		join benefit b on m.idx = b.idx
+		where com_idx = #{com_idx}
+	</select>
+	
+	
+	
+	
+	
+	<select id="approveList"
+		resultType="com.ace.member.model.MemberDTO">
+		SELECT m.*, c.com_name
+		FROM member m
+		JOIN company c ON m.com_idx = c.com_idx
+		WHERE m.rank_num = 0
+		AND m.com_idx IN (
+	    SELECT com_idx
+	    FROM member
+	    WHERE rank_num = 0
+	    GROUP BY com_idx
+	    HAVING COUNT(*) = 1
+		)
+	</select>
+	<select id="getTotalApproveNum" resultType="Integer">
+		SELECT COUNT(*)
+		FROM (
+		    SELECT m.*, c.com_name
+		    FROM member m
+		    JOIN company c ON m.com_idx = c.com_idx
+		    WHERE m.rank_num = 0
+		    AND m.com_idx IN (
+		        SELECT com_idx
+		        FROM member
+		        WHERE rank_num = 0
+		        GROUP BY com_idx
+		        HAVING COUNT(*) = 1
+		    )
+		)  
+	</select>
+	<update id="approveMember" parameterType="java.util.List">
+		UPDATE member
+		SET rank_num = 2
+		WHERE idx IN
+		<foreach collection="list" item="item" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</update>
+	<select id="bossList" parameterType="Map"
+		resultType="com.ace.member.model.MemberDTO">
+		select * from
+		(select rownum as rnum, a.*from
+		(
+
+		SELECT m.idx, m.name,
+		m.com_idx, c.com_name, COALESCE(l.usernum, 0) AS
+		usernum, m.tel
+		FROM
+		member m
+		JOIN company c ON m.com_idx = c.com_idx
+		JOIN rank r ON
+		m.com_idx = r.com_idx
+		LEFT JOIN license l ON m.com_idx = l.com_idx
+		WHERE r.rank_seq = 1
+		AND c.ceo=m.name
+		ORDER BY m.idx
+		)a)b
+		where rnum <![CDATA[>=]]>#{start}
+		and rnum<![CDATA[<=]]>#{end}
+	</select>
+	<select id="bossSearchList" parameterType="Map"
+		resultType="com.ace.member.model.MemberDTO">
+		select * from
+		(select rownum as rnum, a.*from
+		(
+		SELECT m.idx, m.name,
+		m.com_idx, c.com_name, COALESCE(l.usernum, 0) AS
+		usernum, m.tel
+		FROM
+		member m
+		JOIN company c ON m.com_idx = c.com_idx
+		JOIN rank r ON
+		m.com_idx = r.com_idx
+		LEFT JOIN license l ON m.com_idx = l.com_idx
+		WHERE
+		((TO_CHAR(m.idx) LIKE '%' || #{keyword} ||
+		'%')
+		OR
+		(TO_CHAR(m.com_idx)
+		LIKE '%' || #{keyword} || '%')
+		OR (m.name
+		LIKE '%' ||
+		#{keyword} ||
+		'%')
+		OR (c.com_name LIKE '%' || #{keyword} ||
+		'%')
+		OR
+		(TO_CHAR(l.usernum) LIKE '%' || #{keyword} || '%')
+		OR (m.tel LIKE
+		'%'
+		||
+		#{keyword} || '%'))
+		AND m.name = c.ceo
+		AND r.rank_seq = 1
+		ORDER BY
+		m.idx
+		)a)b
+		where rnum <![CDATA[>=]]>#{start}
+		and rnum<![CDATA[<=]]>#{end}
+	</select>
+	<select id="totalBossCnt" resultType="Integer">
+		SELECT count(*)
+		FROM member
+		m
+		JOIN company c ON m.com_idx = c.com_idx
+		JOIN rank r ON m.com_idx =
+		r.com_idx
+		LEFT JOIN license l ON m.com_idx = l.com_idx
+		WHERE r.rank_seq
+		= 1
+		AND c.ceo=m.name
+		ORDER BY m.idx
+	</select>
+	<select parameterType="String" id="totalBossSearchCnt"
+		resultType="Integer">
+		SELECT count(*)
+		FROM member m
+		JOIN company c ON m.com_idx =
+		c.com_idx
+		JOIN rank r ON m.com_idx = r.com_idx
+		LEFT JOIN license l ON
+		m.com_idx = l.com_idx
+		WHERE ((TO_CHAR(m.idx)
+		LIKE '%' || #{keyword} ||
+		'%')
+		OR (TO_CHAR(m.com_idx) LIKE '%' ||
+		#{keyword} || '%')
+		OR (m.name
+		LIKE '%' || #{keyword} || '%')
+		OR
+		(c.com_name LIKE '%' || #{keyword} ||
+		'%')
+		OR (TO_CHAR(l.usernum) LIKE
+		'%' || #{keyword} || '%')
+		OR (m.tel LIKE
+		'%' || #{keyword} || '%'))
+		AND m.name = c.ceo
+		AND r.rank_seq = 1
+	</select>
+	<select id="totalWithdrawCnt" resultType="Integer">
+		select count(*)
+		from
+		(
+		SELECT m.idx, m.name,
+		m.com_idx, c.com_name, l.usernum, m.tel, m.email
+		FROM member m
+		JOIN
+		company c ON m.com_idx = c.com_idx
+		JOIN withdraw w ON c.com_idx =
+		w.com_idx
+		JOIN license l ON m.com_idx = l.com_idx
+		WHERE m.name = c.ceo
+		AND w.withdraw = 1
+		ORDER BY m.idx
+		)
+	</select>
+	<select id="withdrawList" parameterType="Map"
+		resultType="com.ace.member.model.MemberDTO">
+		select * from
+		(select rownum as rnum, a.*from
+		(
+		SELECT m.idx, m.name,
+		m.com_idx, c.com_name, l.usernum, m.tel, m.email
+		FROM member m
+		JOIN
+		company c ON m.com_idx = c.com_idx
+		JOIN withdraw w ON c.com_idx =
+		w.com_idx
+		JOIN license l ON m.com_idx = l.com_idx
+		WHERE m.name = c.ceo
+		AND w.withdraw = 1
+		ORDER BY m.idx
+		)a)b
+		where rnum <![CDATA[>=]]>#{start}
+		and rnum<![CDATA[<=]]>#{end}
+	</select>
+	<update id="submitWithdraw" parameterType="Integer">
+		update withdraw
+		set
+		withdraw=1
+		where com_idx=#{com_idx}
+	</update>
+	<update id="updateRankNum" parameterType="Integer">
+		update member
+		set
+		rank_num=0
+		where com_idx=#{com_idx}
+	</update>
+	<delete id="delCompany" parameterType="Integer">
+		DELETE FROM company
+		WHERE
+		com_idx = #{com_idx}
+	</delete>
+	<delete id="delWithdraw" parameterType="Integer">
+		DELETE FROM withdraw
+		WHERE com_idx = #{com_idx}
+	</delete>
+	
+	
+	
+	
+	
+</mapper>

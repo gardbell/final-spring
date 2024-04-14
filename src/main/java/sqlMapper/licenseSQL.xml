@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ace.license">
+	<insert id="addLicense" parameterType="com.ace.license.model.LicenseDTO">
+		insert into
+		license
+		values(
+		#{com_idx},
+		#{usernum},
+		#{buydate},
+		0
+		)
+	</insert>
+	<delete id="delLicense" parameterType="Integer">
+		delete from 
+		license 
+		where com_idx=#{com_idx} and buydate<![CDATA[<]]>sysdate
+	</delete>
+	<select id="checkLicense" parameterType="Integer" resultType="Integer">
+		select 
+		count(*) 
+		from license 
+		where com_idx=#{com_idx}
+	</select>
+	<select id="checkCEO" parameterType="Integer" resultType="Integer">
+		select 
+		idx 
+		from member 
+		where 
+		com_idx=#{com_idx} and	
+		rank_num=(select rank_num from rank where com_idx=#{com_idx} and rank_seq=1)
+	</select>
+	<update id="stopLicense" parameterType="Integer">
+		update license 
+		set buycontinue=1 
+		where com_idx=#{com_idx}
+	</update>
+	
+	
+	
+	
+	<select id="totalUserNum" resultType="Integer">
+		SELECT SUM(usernum) AS
+		total_usernum
+		FROM license
+	</select>
+	<select id="thisMonthIncome" resultType="Integer">
+		SELECT SUM(pl.price *p.usernum) AS total_price
+		FROM pay p
+		JOIN price_list pl ON p.price_sort = pl.price_sort
+		WHERE TO_CHAR(p.payday, 'YYYY-MM') = TO_CHAR(SYSDATE, 'YYYY-MM')
+	</select>
+	<select id="lastMonthIncome" resultType="Integer">
+		SELECT SUM(pl.price *p.usernum) AS total_price
+		FROM pay p
+		JOIN price_list pl ON p.price_sort = pl.price_sort
+		WHERE TO_CHAR(p.payday, 'YYYY-MM') = TO_CHAR(ADD_MONTHS(SYSDATE, -1), 'YYYY-MM')
+	</select>
+	<select id="2MonthAgoIncome" resultType="Integer">
+		SELECT SUM(pl.price *p.usernum) AS total_price
+		FROM pay p
+		JOIN price_list pl ON p.price_sort = pl.price_sort
+		WHERE TO_CHAR(p.payday, 'YYYY-MM') = TO_CHAR(ADD_MONTHS(SYSDATE, -2), 'YYYY-MM')
+	</select>
+	<select id="3MonthAgoIncome" resultType="Integer">
+		SELECT SUM(pl.price *p.usernum) AS total_price
+		FROM pay p
+		JOIN price_list pl ON p.price_sort = pl.price_sort
+		WHERE TO_CHAR(p.payday, 'YYYY-MM') = TO_CHAR(ADD_MONTHS(SYSDATE, -3), 'YYYY-MM')
+	</select>
+	<select id="4MonthAgoIncome" resultType="Integer">
+		SELECT SUM(pl.price *p.usernum) AS total_price
+		FROM pay p
+		JOIN price_list pl ON p.price_sort = pl.price_sort
+		WHERE TO_CHAR(p.payday, 'YYYY-MM') = TO_CHAR(ADD_MONTHS(SYSDATE, -4), 'YYYY-MM')
+	</select>
+	<select id="5MonthAgoIncome" resultType="Integer">
+		SELECT SUM(pl.price *p.usernum) AS total_price
+		FROM pay p
+		JOIN price_list pl ON p.price_sort = pl.price_sort
+		WHERE TO_CHAR(p.payday, 'YYYY-MM') = TO_CHAR(ADD_MONTHS(SYSDATE, -5), 'YYYY-MM')
+	</select>
+	
+	
+</mapper>

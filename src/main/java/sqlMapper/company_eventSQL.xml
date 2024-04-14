@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ace.company_event">
+
+<insert id="company_eventWrite">
+insert into company_event 
+values(#{com_idx},company_event_event_idx.nextval,#{event_title},#{event_content},sysdate,0,ADD_MONTHS(SYSDATE, 3),(select nvl(max(comment_ref), 0) from company_event) + 1,0,0,#{event_addr},#{event_writer})
+</insert>
+
+<insert id="company_eventReWrite" parameterType="java.util.Map">
+insert into company_event
+values(#{com_idx},company_event_event_idx.nextval,'',#{event_content},sysdate,0,ADD_MONTHS(SYSDATE, 3),#{comment_ref},1,(select max(comment_sunbun) + 1 from company_event where comment_ref = #{comment_ref}),0,#{event_writer})
+</insert>
+
+<select id="company_eventReWriteList" parameterType="java.util.Map" resultType="com.ace.company_event.model.Company_eventDTO">
+select * from
+(select rownum as rnum,a.*from
+(select * from company_event where comment_ref=#{comment_ref} and com_idx=#{com_idx} and comment_sunbun <![CDATA[>]]> 0 order by comment_sunbun desc)a)b 
+where rnum <![CDATA[>=]]>#{start} and rnum<![CDATA[<=]]>#{end}
+</select>
+
+<select id="company_eventList" parameterType="java.util.Map" resultType="com.ace.company_event.model.Company_eventDTO">
+select * from
+(select rownum as rnum,a.*from
+(select * from company_event where com_idx=#{com_idx} and comment_level=0 order by event_idx desc)a)b 
+where rnum <![CDATA[>=]]>#{start} and rnum<![CDATA[<=]]>#{end}
+</select>
+
+<select id="company_eventContnet" parameterType="java.util.Map" resultType="com.ace.company_event.model.Company_eventDTO">
+select * from company_event where event_idx=#{event_idx} and com_idx=#{com_idx}
+</select>
+
+<select id="company_eventSearchContnet" parameterType="java.util.Map" resultType="com.ace.company_event.model.Company_eventDTO">
+select * from company_event where event_idx=#{event_idx} and com_idx=#{com_idx}
+</select>
+
+<select id="eventReListTotalCnt" parameterType="java.util.Map" resultType="Integer">
+select count(*) from company_event where comment_ref = #{comment_ref}
+and com_idx = #{com_idx}
+and comment_sunbun > 0
+</select>
+
+<select id="eventTotalCnt" parameterType="Integer" resultType="Integer">
+select count(*) from company_event where com_idx=#{com_idx} and comment_level=0
+</select>
+
+<select id="company_eventSearch" parameterType="java.util.Map" resultType="com.ace.company_event.model.Company_eventDTO">
+select * from
+(select rownum as rnum,a.*from
+(select * from company_event where com_idx=#{com_idx} and event_title like '%' || #{eventKeyword} || '%' order by event_idx desc)a)b 
+where rnum <![CDATA[>=]]>#{start} and rnum<![CDATA[<=]]>#{end}
+</select>
+
+<select id="eventSearchTotalCnt" parameterType="java.util.Map" resultType="Integer">
+select count(*) from company_event where event_title like '%' || #{eventKeyword} || '%' and com_idx=#{com_idx}
+</select>
+
+<delete id="company_eventDelete" parameterType="Integer">
+delete from company_event where event_idx=#{event_idx}
+</delete>
+
+<select id="company_eventUpdateForm" parameterType="Integer" resultType="com.ace.company_event.model.Company_eventDTO">
+select * from company_event where event_idx=#{event_idx}
+</select>
+
+<update id="company_eventUpdate" parameterType="com.ace.company_event.model.Company_eventDTO">
+update company_event set event_title=#{event_title},event_writer=#{event_writer},event_addr=#{event_addr},event_content=#{event_content} where event_idx=#{event_idx}
+</update>
+
+<select id="company_eventPreviousEvent" parameterType="java.util.Map" resultType="com.ace.company_event.model.Company_eventDTO">
+select * from (select * from company_event where com_idx = #{com_idx} and comment_ref = (select max(comment_ref) from company_event where com_idx = #{com_idx} and comment_ref <![CDATA[<]]> (select comment_ref from company_event where event_idx = #{event_idx}))
+and comment_level = 0)
+where rownum = 1
+</select>
+
+<select id="company_eventSearchPreviousEvent" parameterType="java.util.Map" resultType="com.ace.company_event.model.Company_eventDTO">
+select * from (select * from company_event where com_idx = #{com_idx} and comment_ref = (select max(comment_ref) from company_event where com_idx = #{com_idx} and event_title like '%' || #{eventKeyword} || '%' and comment_ref <![CDATA[<]]> (select comment_ref from company_event where event_idx = #{event_idx}))
+and comment_level = 0)where rownum = 1
+</select>
+
+<select id="company_eventNextEvent" parameterType="java.util.Map" resultType="com.ace.company_event.model.Company_eventDTO">
+select * from (select * from company_event where com_idx = #{com_idx} and comment_ref = (select min(comment_ref)from company_event where com_idx = #{com_idx} and comment_ref <![CDATA[>]]> (select comment_ref from company_event where event_idx = #{event_idx})) 
+and comment_level = 0)
+where rownum = 1
+</select>
+
+<select id="company_eventSearchNextEvent" parameterType="java.util.Map" resultType="com.ace.company_event.model.Company_eventDTO">
+select * from (select * from company_event where com_idx = #{com_idx} and comment_ref = (select min(comment_ref)from company_event where com_idx = #{com_idx} and event_title like '%' || #{eventKeyword} || '%' and comment_ref <![CDATA[>]]> (select comment_ref from company_event where event_idx = #{event_idx})) 
+and comment_level = 0)
+where rownum = 1
+</select>
+
+<update id="company_eventReadnumUpdate" parameterType="Integer">
+update company_event set event_readnum=event_readnum+1 where event_idx=#{event_idx}
+</update>
+
+<select id="comEvent3" parameterType="Integer" resultType="com.ace.company_event.model.Company_eventDTO">
+   select * from (select * from company_event where com_idx=#{com_idx} and comment_level=0 order by event_idx DESC)
+   where ROWNUM <![CDATA[<]]>= 5
+   </select>
+
+</mapper>
+

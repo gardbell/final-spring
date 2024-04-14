@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ace.qna">
+
+	<select id="totalQnaCnt" resultType="Integer">
+		select count(*)
+		from qna
+		where qna_category != '답변'
+	</select>
+	<select id="notAnswerQnaCnt" resultType="Integer">
+		select count(*)
+		from qna
+		where qna_answer=0
+	</select>
+	<select id="qnaList" parameterType="Map"
+		resultType="com.ace.qna.model.QnaDTO">
+		select * from
+		(select rownum as rnum, a.*from
+		(
+		SELECT *
+		FROM qna
+		WHERE
+		qna_category != '답변'
+		ORDER BY
+		qna_idx desc
+		)a)b
+		where rnum <![CDATA[>=]]>#{start}
+		and rnum<![CDATA[<=]]>#{end}
+	</select>
+	<select id="qnaSearchList" parameterType="Map"
+		resultType="com.ace.qna.model.QnaDTO">
+		select * from
+		(select rownum as rnum, a.*from
+		(
+		SELECT *
+		FROM qna
+		WHERE
+		((TO_CHAR(qna_idx) LIKE '%' || #{keyword} || '%')
+		OR (qna_category LIKE
+		'%' || #{keyword} || '%')
+		OR (qna_title LIKE '%' || #{keyword} || '%'))
+		AND qna_category != '답변'
+		ORDER BY qna_idx desc
+		)a)b
+		where rnum <![CDATA[>=]]>#{start}
+		and rnum<![CDATA[<=]]>#{end}
+	</select>
+	<select parameterType="String" id="totalQnaSearchCnt"
+		resultType="Integer">
+		select count(*)
+		FROM qna
+		WHERE
+		((TO_CHAR(qna_idx) LIKE '%' ||
+		#{keyword} || '%')
+		OR (qna_category LIKE '%' || #{keyword} || '%')
+		OR
+		(qna_title LIKE '%' || #{keyword} || '%'))
+		ORDER BY qna_idx desc
+	</select>
+	<delete id="deleteQna" parameterType="java.util.List">
+		DELETE FROM qna
+		WHERE qna_idx IN
+		<foreach collection="list" item="item" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+	<select id="qnaContent" parameterType="Integer"
+		resultType="com.ace.qna.model.QnaDTO">
+		select *
+		from qna
+		where qna_idx=#{qna_idx}
+		AND ROWNUM = 1
+	</select>
+	<select id="getWriterName" parameterType="Integer"
+		resultType="String">
+		select name
+		from member
+		where idx=#{qna_writer}
+		AND ROWNUM = 1
+	</select>
+	<select id="getCompanyName" parameterType="Integer"
+		resultType="String">
+		select c.com_name
+		from company c
+		join member m on
+		m.com_idx=c.com_idx
+		join qna q on q.qna_writer=m.idx
+		where
+		q.qna_writer=#{qna_writer}
+		AND ROWNUM = 1
+	</select>
+	<insert id="qnaInsert" parameterType="com.ace.qna.model.QnaDTO">
+		insert into qna
+		values(qna_idx.nextval,#{qna_category},#{qna_title},#{qna_content},0,#{qna_writer},(select
+		nvl(max(qna_ref), 0) from qna) + 1,0,0)
+	</insert>
+	<insert id="qnaCommentInsert"
+		parameterType="com.ace.qna.model.QnaDTO">
+		insert into qna
+		values(qna_idx.nextval,'답변',#{qna_title},#{qna_content},1,#{qna_writer},#{qna_ref},0,(select
+		max(qna_sunbun) + 1 from qna where qna_ref = #{qna_ref}))
+	</insert>
+	<select id="qnaCommentList" parameterType="Integer"
+		resultType="com.ace.qna.model.QnaDTO">
+
+		SELECT *
+		FROM qna
+		WHERE qna_ref=#{qna_ref}
+		AND qna_category =
+		'답변'
+		ORDER BY
+		qna_sunbun desc
+
+	</select>
+	<update id="qnaAnswerUpdate" parameterType="com.ace.qna.model.QnaDTO">
+		UPDATE qna
+		SET qna_answer = 1
+		WHERE qna_idx=#{qna_idx}
+	</update>
+</mapper>

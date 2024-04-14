@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+	PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+	"https://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<mappers>
+		<mapper resource="sqlMapper/memberSQL.xml"/>
+		<mapper resource="sqlMapper/comFindSQL.xml"/>
+		<mapper resource="sqlMapper/company_eventSQL.xml"/>
+		<mapper resource="sqlMapper/company_newsSQL.xml"/>
+		<mapper resource="sqlMapper/client_telSQL.xml"/>
+		<mapper resource="sqlMapper/scheduleSQL.xml"/>
+		<mapper resource="sqlMapper/salesSQL.xml"/>
+		<mapper resource="sqlMapper/benefitSQL.xml"/>
+		<mapper resource="sqlMapper/workSQL.xml"/>
+		<mapper resource="sqlMapper/paySQL.xml"/>
+		<mapper resource="sqlMapper/price_listSQL.xml"/>
+		<mapper resource="sqlMapper/licenseSQL.xml"/>
+		<mapper resource="sqlMapper/price_listSQL.xml" />		
+		<mapper resource="sqlMapper/policySQL.xml" />		
+		<mapper resource="sqlMapper/qnaSQL.xml" />			
+		<mapper resource="sqlMapper/site_logSQL.xml"/>
+		<mapper resource="sqlMapper/approval_fileSQL.xml"/>
+		<mapper resource="sqlMapper/approvalSQL.xml"/>
+    </mappers>
+</configuration>

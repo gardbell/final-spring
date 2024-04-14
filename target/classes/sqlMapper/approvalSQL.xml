@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ace.approval">
+	<select id="selectApprover" parameterType="Integer"
+		resultType="com.ace.member.model.MemberDTO">
+		select
+		idx, name
+		from member
+		where com_idx=#{com_idx}
+	</select>
+	<select id="getRef" parameterType="Integer" resultType="Integer">
+		select
+		nvl(max(ref),0)
+		from approval
+		where com_idx=#{com_idx}
+		
+	</select>
+	<select id="writeApproval"
+		parameterType="com.ace.approval.model.ApprovalDTO">
+		insert into
+		approval
+		values(
+		#{com_idx},
+		#{ref},
+		#{title},
+		#{content},
+		sysdate,
+		#{writer},
+		#{approver},
+		1
+		)
+	</select>
+	<select id="appTotalCnt" parameterType="Integer" resultType="Integer">
+		select count(*) from approval where
+		<if test="check==1">
+			writer=#{idx}
+		</if>
+		<if test="check==2">
+			writer=#{idx} and approval_check=1
+		</if>
+		<if test="check==3">
+			approver=#{idx}
+		</if>
+		<if test="check==4">
+			approver=#{idx} and approval_check=1
+		</if>
+	</select>
+	<select id="approvalList" parameterType="java.util.Map"
+		resultType="com.ace.approval.model.ApprovalDTO">
+		select c.*, m.name from 
+		(select * from
+		(select rownum as rnum,a.*from
+		(select * from approval where 
+		<if test="check==1">
+			writer=#{idx}
+		</if>
+		<if test="check==2">
+			writer=#{idx} and approval_check=1
+		</if>
+		<if test="check==3">
+			approver=#{idx}
+		</if>
+		<if test="check==4">
+			approver=#{idx} and approval_check=1
+		</if>
+		order by ref
+		desc)a)b
+		where rnum <![CDATA[>=]]>#{start}
+		and rnum<![CDATA[<=]]>#{end})c, member m
+		where c.writer=m.idx
+	</select>
+	<select id="approvalContent" parameterType="java.util.Map"
+		resultType="com.ace.approval.model.ApprovalDTO">
+		select a.*, m.name from
+		(select * from approval where ref=#{ref} and com_idx=#{com_idx})a, 
+		member m where a.writer=m.idx
+	</select>
+	<update id="updateApproval" parameterType="com.ace.approval.model.ApprovalDTO">
+		update approval
+		set 
+		title=#{title}, 
+		approver=#{approver}, 
+		content=#{content} 
+		where ref=#{ref}
+	</update>
+	<delete id="deleteApproval" parameterType="java.util.Map">
+		delete 
+		from approval
+		where com_idx=#{com_idx} and ref=#{ref}
+	</delete>
+	<update id="checkApproval" parameterType="java.util.Map">
+		update approval
+		set approval_check=0
+		where ref=#{ref} and com_idx=#{com_idx}
+	</update>
+</mapper>
+
+

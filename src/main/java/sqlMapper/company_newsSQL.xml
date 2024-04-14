@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ace.company_news">
+	<insert id="company_newsWrite"
+		parameterType="com.ace.company_news.model.Company_newsDTO">
+		insert into company_news
+		values(#{com_idx},company_news_news_idx.nextval,#{news_title},#{news_content},sysdate,0,#{news_writer})
+	</insert>
+	
+	<select id="company_newsList" parameterType="java.util.Map" resultType="com.ace.company_news.model.Company_newsDTO">
+	select * from
+	(select rownum as rnum,a.*from
+	(select * from company_news where com_idx=#{com_idx} order by news_idx desc)a)b 
+	where rnum <![CDATA[>=]]>#{start} and rnum<![CDATA[<=]]>#{end}
+	</select>
+	
+	<select id="totalCnt" parameterType="Integer" resultType="Integer">
+	select count(*) from company_news where com_idx=#{com_idx}
+	</select>
+	
+	<select id="company_newsSearch" parameterType="java.util.Map" resultType="com.ace.company_news.model.Company_newsDTO">	
+	select * from
+	(select rownum as rnum,a.*from
+	(select * from company_news where com_idx=#{com_idx} and news_title like '%' || #{keyword} || '%' order by news_idx desc)a)b 
+	where rnum <![CDATA[>=]]>#{start} and rnum<![CDATA[<=]]>#{end}
+	</select>
+	
+	<select id="SearchTotalCnt" parameterType="java.util.Map" resultType="Integer">
+	select count(*) from company_news where news_title like '%' || #{keyword} || '%' and com_idx=#{com_idx}
+	</select>
+	
+	<select id="company_newsContent" parameterType="java.util.Map"  resultType="com.ace.company_news.model.Company_newsDTO">
+	select * from company_news where news_idx=#{news_idx} and com_idx=#{com_idx}
+	</select>
+	
+	<select id="company_newsSearchContent" parameterType="java.util.Map" resultType="com.ace.company_news.model.Company_newsDTO">
+	select * from company_news where news_idx=#{news_idx} and com_idx=#{com_idx}
+	</select>
+	
+	<delete id="company_newsDelete" parameterType="Integer">
+	delete from company_news where news_idx=#{news_idx}
+	</delete>
+	
+	<select id="company_newsUpdateForm" parameterType="Integer" resultType="com.ace.company_news.model.Company_newsDTO">
+	select * from company_news where news_idx=#{news_idx}
+	</select>
+	
+	<update id="company_newsUpdate" parameterType="com.ace.company_news.model.Company_newsDTO">
+	update company_news set news_title=#{news_title},news_writer=#{news_writer},news_content=#{news_content} where news_idx=#{news_idx}
+	</update>
+	
+	<update id="company_newsReadnumUpdate" parameterType="Integer">
+	update company_news set news_readnum=news_readnum+1 where news_idx=#{news_idx}
+	</update>
+	
+	<select id="company_newsPreviousNews" parameterType="java.util.Map" resultType="com.ace.company_news.model.Company_newsDTO">
+	SELECT * FROM (SELECT * FROM company_news WHERE com_idx=#{com_idx} and news_writedate <![CDATA[<]]> (SELECT news_writedate FROM company_news WHERE news_idx=#{news_idx})ORDER BY news_writedate desc)
+	WHERE ROWNUM = 1
+	</select>
+	
+	<select id="company_newsSearchPreviousNews" parameterType="java.util.Map" resultType="com.ace.company_news.model.Company_newsDTO">
+	select * from (select * from company_news where com_idx=#{com_idx} and news_title like '%' || #{keyword} || '%' and news_writedate <![CDATA[<]]> (select news_writedate from company_news where news_idx=#{news_idx})order by news_writedate desc)
+	where rownum = 1
+	</select>
+	
+	<select id="company_newsNextNews" parameterType="java.util.Map" resultType="com.ace.company_news.model.Company_newsDTO">
+	SELECT * FROM (SELECT * FROM company_news WHERE com_idx=#{com_idx} and news_writedate <![CDATA[>]]> (SELECT news_writedate FROM company_news WHERE news_idx=#{news_idx})ORDER BY news_writedate ASC)
+	WHERE ROWNUM = 1
+	</select>
+	
+	<select id="company_newsSearchNextNews" parameterType="java.util.Map" resultType="com.ace.company_news.model.Company_newsDTO">
+	select * from (select * from company_news where com_idx=#{com_idx} and news_title like '%' || #{keyword} || '%' and news_writedate <![CDATA[>]]> (select news_writedate from company_news where news_idx=#{news_idx})order by news_writedate asc)
+	where rownum = 1
+	</select>
+	
+	<select id="comNews3" parameterType="Integer" resultType="com.ace.company_news.model.Company_newsDTO">
+   select * from (select * from company_news where com_idx=#{com_idx} order by news_idx DESC)
+   where ROWNUM <![CDATA[<]]>= 5
+   </select>
+</mapper>
+
+
+
+
+
+
+
